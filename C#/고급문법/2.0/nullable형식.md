@@ -1,0 +1,68 @@
+# nullable 형식 
+nullable 형식이란 `System.Nullable<T>` 구조체를 의미한다. 그런데 왜 `Nullable<T>` 타입이 필요한 것일까? 
+<br>
+
+일반적으로 값 형식은 초깃값이 0으로 채워진다. 문제는 이러한 초기값이 정말 0이라는 숫자값을 가지고 있는 것인지, 아니면 값이 없는 상태인지를 구분할 수 없다는 점이다. 예를 들어, 여러분이 만든 웹 사이트의 회원 가입란에 결혼 여부를 선택 사항으로 묻는다고 가정해 보자. 아마도 이 회원 정보에 대한 클래스를 다음과 같이 정의할 것이다. 
+
+```cs
+public class SiteMember
+{
+    bool _getMarried;
+    public bool GetMaried
+    {
+        get {return _getMarried;} set {_getMarried = value;} 
+    }
+}
+```
+
+bool 타입은 true/false 값만 가질 수 있는데, 여기서 전형적인 값 형식의 문제점이 발생한다. 즉, 사이트에 가입한 사라이 결혼 여부를 입력하지 않고 넘어갔다고 가정해 보자. 그렇다면 그 사람은 결혼한 것으로 판정해야 할까? 아니면 미혼으로 둬야 할까? 즉, 선택적으로 입력할 수 있는 결혼 여부에 대한 정보라면 "결혼/미혼/미정"과 같은 3가지 상태를 표현할 수 있어야 하지만 bool 타입으로는 이렇게 할 수 없다. 이런 문제는 값 형식의 모든 타입에서 동일하게 발생한다. 반면 참조 형식에서는 "미정"이라는 상태를 null로 표현할 수 있으므로 이런 문제가 발생하지 않는다. 
+<br>
+
+`Nullable<T>` 타입은 일반적인 값 형식에 대해 null 표현이 가능하게 하는 역할을 한다. 따라서 GetMarried 필드를 다음과 같이 정의하면 문제가 해결된다. 
+<br>
+
+```cs
+Nullable<bool> _getMarried;
+public Nullable<bool> GetMarried
+{
+    get {return _getMarried;} set {_getMarried = value; }
+}
+```
+<br>
+
+부가적으로 C#은 Nullable<T> 표기의 축약형으로 값 형식의 "?" 문자를 함께 붙이는 표현도 지원하므로 다음과 같이 표현해도 된다.
+
+```cs
+bool? _getMarried;
+
+public bool? GetMarried
+{
+    get {return _getMarried;} set {_getMarried = value;}
+}
+```
+"?" 문자를 값 형식에 붙이면 C# 컴파일러는 빌드 시에 자동으로 `Nullable<T>`로 바꾸기만 할 뿐이다. 
+<br>
+
+`Nullable<T>` 타입은 HasValue, Value라는 두 가지 속성을 제공하는데, 값이 할당됐는지 여부를 HasValue 불린 값으로 반환하고, 값이 있다면 원래의 T 타입에 해당하는 값을 Value 속성으로 반환한다. 
+
+```cs
+static void Main(string[] args)
+{
+    Nullable<int> intValue = 10;
+
+    // Nullable<T>에서 T로 대입 
+    int target = intValue.Value;
+
+    //T에서 Nullable<T>로 대입
+    intvalue = target;
+
+    //Nullable<T>에 null 값을 대입 
+    double? temp = null;
+
+    Console.WriteLine(temp.HasValue);   // 출력 결과: False
+
+    temp = 3.141592;
+    Console.WriteLine(temp.HasValue);   // 출력 결과: True
+    Console.WriteLine(temp.Value);      // 출력 결과: 3.141592
+}
+```
